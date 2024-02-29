@@ -1,6 +1,21 @@
 import json
 
 
+def load_data_from_json(file_path):
+    categories = []
+
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+        for category_data in data:
+            category = Category(category_data['name'], category_data['description'])
+            for product_data in category_data['products']:
+                product = Product(product_data['name'], product_data['description'],
+                                  product_data['price'], product_data['quantity'])
+                category.products.append(product)
+                categories.append(category)
+    return categories
+
+
 class Category:
     total_categories = 0
     total_unique_products = set()
@@ -11,6 +26,7 @@ class Category:
         self.products = []
         Category.total_categories += 1
 
+
 class Product:
     def __init__(self, name, description, price, quantity_in_stock):
         self.name = name
@@ -18,18 +34,3 @@ class Product:
         self.price = price
         self.quantity_in_stock = quantity_in_stock
         Category.total_unique_products.add(name)
-
-def load_data_from_json(file_path):
-    categories = []
-
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-
-        for category_data in data:
-            category = Category(category_data['name'], category_data['description'])
-            for product_data in category_data['products']:
-                product = Product(product_data['name'], product_data['description'], product_data['price'], product_data['quantity_in_stock'])
-                category.products.append(product)
-                categories.append(category)
-
-    return categories
