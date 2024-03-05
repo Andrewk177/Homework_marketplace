@@ -18,13 +18,16 @@ def load_data_from_json(file_path):
 
 class Category:
     total_categories = 0
-    total_unique_products = set()
 
-    def __init__(self, name, description):
+    def __init__(self, name, description, products):
         self.name = name
         self.description = description
-        self.products = []
+        self.products = products
         Category.total_categories += 1
+        unique_products = set()
+        for product in products:
+            unique_products.add(product.name)
+        Category.total_unique_products = len(unique_products)
 
 
 class Product:
@@ -33,4 +36,3 @@ class Product:
         self.description = description
         self.price = price
         self.quantity_in_stock = quantity_in_stock
-        Category.total_unique_products.add(name)
