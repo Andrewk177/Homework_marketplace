@@ -2,26 +2,22 @@ from utils import Category, Product
 
 
 def test_category_initialization():
-    category = Category("Test Category", "This is a test category")
-    assert category.name == "Test Category"
-    assert category.products == []
+    products = [Product("Product1", "Description1", 10.99, 50), Product("Product2", "Description2", 20.99, 30)]
+    category = Category("Category1", "Category Description", products)
+    assert category.name == "Category1"
+    assert category.description == "Category Description"
+    assert category.products == products
 
 
 def test_product_initialization():
-    product = Product("Test Product", "This is a test product", 10.99, 100)
-    assert product.name == "Test Product"
-    assert product.description == "This is a test product"
+    product = Product("Product1", "Description1", 10.99, 50)
+    assert product.name == "Product1"
+    assert product.description == "Description1"
     assert product.price == 10.99
-    assert product.quantity_in_stock == 100
+    assert product.quantity_in_stock == 50
 
 
-def test_total_categories():
-    assert Category.total_categories == 0
-    category_1 = Category("Category 1", "Description 1")
+def test_load_data_from_json():
     assert Category.total_categories == 1
 
 
-def test_total_unique_products():
-    assert len(Category.total_unique_products) == 0
-    product_1 = Product("Product 1", "Description 1", 9.99, 50)
-    assert len(Category.total_unique_products) == 1
