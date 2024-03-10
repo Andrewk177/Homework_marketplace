@@ -8,6 +8,12 @@ def test_category_initialization():
     assert category.description == "Category Description"
     assert category.products == products
 
+    Category.unique_product_names.clear()
+    Category.total_unique_products = 0
+    product1 = Product("Widget", "A widget", 19.99, 100)
+    category1 = Category("Electronics", "Electronic goods", [product1])
+    assert Category.total_unique_products == 1
+
 
 def test_product_initialization():
     product = Product("Product1", "Description1", 10.99, 50)
