@@ -16,16 +16,18 @@ def load_data_from_json(file_path):
         return categories
 
 
+
 class Category:
-    total_categories = 0
+    total_categories = []
     total_unique_products = 0
     unique_product_names = set()
 
-    def __init__(self, name, description):
+    def __init__(self, name, description, products=None):
         self.name = name
         self.description = description
-        self.__products = []
-        Category.total_categories += 1
+        self.__products = products if products is not None else []
+        Category.total_categories.append(self)
+        Category.total_unique_products += len(set(product.name for product in self.__products))
 
     @property
     def products(self):
