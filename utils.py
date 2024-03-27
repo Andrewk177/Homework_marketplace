@@ -16,6 +16,36 @@ def load_data_from_json(file_path):
         return categories
 
 
+class Product:
+    def __init__(self, name, description, price, quantity_in_stock):
+        self.name = name
+        self.description = description
+        self._price = price
+        self.quantity_in_stock = quantity_in_stock
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, value):
+        if value <= 0:
+            raise ValueError("Введена некорректная цена.")
+        elif value < self._price:
+            confirmation = input("Цена изменилась. Подтвердить? (да/нет): ")
+            if confirmation.lower() == 'да':
+                self._price = value
+        else:
+            self._price = value
+
+    def __str__(self):
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity_in_stock} шт."
+
+    def __add__(self, other):
+        total_price = (self.price * self.quantity_in_stock) + (other.price * other.quantity_in_stock)
+        total_quantity = self.quantity_in_stock + other.quantity_in_stock
+        return total_price / total_quantity
+
 
 class Category:
     total_categories = []
@@ -39,40 +69,8 @@ class Category:
         Category.unique_product_names.add(product.name)
         Category.total_unique_products = len(Category.unique_product_names)
 
+    def __str__(self):
+        return f"{self.name}, количество продуктов: {len(self.__products)} шт."
 
-class Product:
-    def __init__(self, name, description, price, quantity_in_stock):
-        self.name = name
-        self.description = description
-        self._price = price
-        self.quantity_in_stock = quantity_in_stock
-
-    @property
-    def price(self):
-        return self._price
-
-    @price.setter
-    def price(self, value):
-        if value <= 0:
-            raise ValueError("Введена некорректная цена.")
-        elif value < self._price:
-            confirmation = input("Цена изменилась. Подтвердить? (да/нет): ")
-            if confirmation.lower() == 'да':
-                self._price = value
-        else:
-            self._price = value
-
-    @classmethod
-    def create_product_from_dict(cls, data, product_list):
-        name = data.get('name')
-        description = data.get('description')
-        price = data.get('price')
-        quantity_in_stock = data.get('quantity')
-
-        for existing_product in product_list:
-            if existing_product.name == name:
-                existing_product.quantity_in_stock += quantity_in_stock
-                existing_product.price = max(existing_product.price, price)
-                return existing_product
-        else:
-            return cls(name, description, price, quantity_in_stock)
+    def __len__(self):
+        return sum(product.quantity_in_stock for product in self.__products)
