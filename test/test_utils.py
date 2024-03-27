@@ -3,7 +3,7 @@ import pytest
 
 
 def test_load_data_from_json():
-    assert Category.total_categories == 0
+    assert Category.total_categories == []
 
 
 def test_create_category():

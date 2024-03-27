@@ -16,28 +16,6 @@ def load_data_from_json(file_path):
         return categories
 
 
-class Category:
-    total_categories = 0
-    total_unique_products = 0
-    unique_product_names = set()
-
-    def __init__(self, name, description):
-        self.name = name
-        self.description = description
-        self.__products = []
-        Category.total_categories += 1
-
-    @property
-    def products(self):
-        return "\n".join([f"{product.name}, {product.price} руб. Stock: {product.quantity_in_stock} шт."
-                          for product in self.__products])
-
-    def add_product(self, product):
-        self.__products.append(product)
-        Category.unique_product_names.add(product.name)
-        Category.total_unique_products = len(Category.unique_product_names)
-
-
 class Product:
     def __init__(self, name, description, price, quantity_in_stock):
         self.name = name
@@ -60,17 +38,39 @@ class Product:
         else:
             self._price = value
 
-    @classmethod
-    def create_product_from_dict(cls, data, product_list):
-        name = data.get('name')
-        description = data.get('description')
-        price = data.get('price')
-        quantity_in_stock = data.get('quantity')
+    def __str__(self):
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity_in_stock} шт."
 
-        for existing_product in product_list:
-            if existing_product.name == name:
-                existing_product.quantity_in_stock += quantity_in_stock
-                existing_product.price = max(existing_product.price, price)
-                return existing_product
-        else:
-            return cls(name, description, price, quantity_in_stock)
+    def __add__(self, other):
+        total_price = (self.price * self.quantity_in_stock) + (other.price * other.quantity_in_stock)
+        total_quantity = self.quantity_in_stock + other.quantity_in_stock
+        return total_price / total_quantity
+
+
+class Category:
+    total_categories = []
+    total_unique_products = 0
+    unique_product_names = set()
+
+    def __init__(self, name, description, products=None):
+        self.name = name
+        self.description = description
+        self.__products = products if products is not None else []
+        Category.total_categories.append(self)
+        Category.total_unique_products += len(set(product.name for product in self.__products))
+
+    @property
+    def products(self):
+        return "\n".join([f"{product.name}, {product.price} руб. Stock: {product.quantity_in_stock} шт."
+                          for product in self.__products])
+
+    def add_product(self, product):
+        self.__products.append(product)
+        Category.unique_product_names.add(product.name)
+        Category.total_unique_products = len(Category.unique_product_names)
+
+    def __str__(self):
+        return f"{self.name}, количество продуктов: {len(self.__products)} шт."
+
+    def __len__(self):
+        return sum(product.quantity_in_stock for product in self.__products)
