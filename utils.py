@@ -38,10 +38,30 @@ class Product:
         else:
             self._price = value
 
-    def __str__(self):
-        return f"{self.name}, {self.price} руб. Остаток: {self.quantity_in_stock} шт."
+    @classmethod
+    def create_product_from_dict(cls, product_list):
+        return product_list
+
+
+class Smartphone(Product):
+    def __init__(self, name, description, price, quantity_in_stock, performance, model, memory, color):
+        super().__init__(name, description, price, quantity_in_stock)
+        self.performance = performance
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+    def __init__(self, name, description, price, quantity_in_stock, country_of_origin, germination_period, color):
+        super().__init__(name, description, price, quantity_in_stock)
+        self.country_of_origin = country_of_origin
+        self.germination_period = germination_period
+        self.color = color
 
     def __add__(self, other):
+        if not isinstance(other, type(self)):
+            raise TypeError("Нельзя складывать товары разных типов.")
         total_price = (self.price * self.quantity_in_stock) + (other.price * other.quantity_in_stock)
         total_quantity = self.quantity_in_stock + other.quantity_in_stock
         return total_price / total_quantity
@@ -65,9 +85,12 @@ class Category:
                           for product in self.__products])
 
     def add_product(self, product):
-        self.__products.append(product)
-        Category.unique_product_names.add(product.name)
-        Category.total_unique_products = len(Category.unique_product_names)
+        if isinstance(product, Product):
+            self.__products.append(product)
+            Category.unique_product_names.add(product.name)
+            Category.total_unique_products = len(Category.unique_product_names)
+        else:
+            raise TypeError("Можно добавлять только продукты.")
 
     def __str__(self):
         return f"{self.name}, количество продуктов: {len(self.__products)} шт."
