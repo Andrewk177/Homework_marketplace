@@ -51,6 +51,10 @@ class Smartphone(Product):
         self.memory = memory
         self.color = color
 
+    def __add__(self, other):
+        if not isinstance(other, Smartphone):
+            raise TypeError("Cannot add objects of different types.")
+
 
 class LawnGrass(Product):
     def __init__(self, name, description, price, quantity_in_stock, country_of_origin, germination_period, color):
@@ -60,11 +64,8 @@ class LawnGrass(Product):
         self.color = color
 
     def __add__(self, other):
-        if not isinstance(other, type(self)):
-            raise TypeError("Нельзя складывать товары разных типов.")
-        total_price = (self.price * self.quantity_in_stock) + (other.price * other.quantity_in_stock)
-        total_quantity = self.quantity_in_stock + other.quantity_in_stock
-        return total_price / total_quantity
+        if not isinstance(other, LawnGrass):
+            raise TypeError("Cannot add objects of different types.")
 
 
 class Category:
