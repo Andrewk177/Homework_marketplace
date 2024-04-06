@@ -1,4 +1,5 @@
 import json
+from abc import ABC, abstractmethod
 
 
 def load_data_from_json(file_path):
@@ -16,12 +17,44 @@ def load_data_from_json(file_path):
         return categories
 
 
-class Product:
+class ObjectCreationLogger:
+    def __repr__(self):
+        attributes = ', '.join(f"{key}={value!r}" for key, value in self.__dict__.items())
+        return f"{self.__class__.__name__}({attributes})"
+
+
+class PurchasableItem(ABC, ObjectCreationLogger):
+    @abstractmethod
+    def total_cost(self):
+        pass
+
+
+class Item(ABC):
     def __init__(self, name, description, price, quantity_in_stock):
         self.name = name
         self.description = description
         self._price = price
         self.quantity_in_stock = quantity_in_stock
+        print(self)
+
+    @property
+    @abstractmethod
+    def price(self):
+        pass
+
+    @price.setter
+    @abstractmethod
+    def price(self, value):
+        pass
+
+    @abstractmethod
+    def __add__(self, other):
+        pass
+
+
+class Product(Item, PurchasableItem):
+    def __init__(self, name, description, price, quantity_in_stock):
+        super().__init__(name, description, price, quantity_in_stock)
 
     @property
     def price(self):
@@ -31,16 +64,36 @@ class Product:
     def price(self, value):
         if value <= 0:
             raise ValueError("Введена некорректная цена.")
-        elif value < self._price:
-            confirmation = input("Цена изменилась. Подтвердить? (да/нет): ")
-            if confirmation.lower() == 'да':
-                self._price = value
         else:
             self._price = value
 
     @classmethod
-    def create_product_from_dict(cls, product_list):
-        return product_list
+    def create_product_from_dict(cls, product_data):
+        return cls(**product_data)
+
+    def __add__(self, other):
+        if not isinstance(other, Product):
+            return NotImplemented
+        return Product(
+            name=f"{self.name} & {other.name}",
+            description=f"{self.description} | {other.description}",
+            price=self.price + other.price,
+            quantity_in_stock=self.quantity_in_stock + other.quantity_in_stock
+        )
+
+    def total_cost(self):
+        return self._price * self.quantity_in_stock
+
+
+class Order(PurchasableItem):
+    def __init__(self, product, quantity):
+        self.product = product
+        self.quantity = quantity
+        self.total_price = self.total_cost()
+        print(self)
+
+    def total_cost(self):
+        return self.product.price * self.quantity
 
 
 class Smartphone(Product):
