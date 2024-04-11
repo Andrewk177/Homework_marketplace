@@ -121,6 +121,23 @@ class LawnGrass(Product):
             raise TypeError("Cannot add objects of different types.")
 
 
+class ZeroQuantityError(Exception):
+    def __init__(self, message="Товар с нулевым количеством не может быть добавлен."):
+        self.message = message
+        super().__init__(self.message)
+
+
+try:
+    quantity = 0
+    if quantity == 0:
+        raise ZeroQuantityError
+    print("Товар добавлен.")
+except ZeroQuantityError as e:
+    print(e)
+finally:
+    print("Обработка добавления товара завершена.")
+
+
 class Category:
     total_categories = []
     total_unique_products = 0
@@ -140,14 +157,22 @@ class Category:
 
     def add_product(self, product):
         if isinstance(product, Product):
+            if product.quantity_in_stock == 0:
+                raise ValueError("Добавление товара с нулевым количеством.")
             self.__products.append(product)
             Category.unique_product_names.add(product.name)
             Category.total_unique_products = len(Category.unique_product_names)
+            print("Товар добавлен.")
         else:
             raise TypeError("Можно добавлять только продукты.")
+        print("Обработка добавления товара завершена.")
 
-    def __str__(self):
-        return f"{self.name}, количество продуктов: {len(self.__products)} шт."
-
-    def __len__(self):
-        return sum(product.quantity_in_stock for product in self.__products)
+    def average_price(self):
+        try:
+            if len(self.__products) == 0:
+                raise ZeroDivisionError
+            return sum(product.price for product in self.__products) / len(self.__products)
+        except ZeroDivisionError:
+            return 0
+        finally:
+            print("Обработка завершена.")
